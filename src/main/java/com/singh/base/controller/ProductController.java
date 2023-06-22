@@ -27,12 +27,24 @@ import com.singh.base.exceptions.RecordAlreadyExistException;
 import com.singh.base.model.ProductModel;
 import com.singh.base.service.ProductService;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+
 @RestController
 public class ProductController {
 	
 	@Autowired
 	private ProductService service;
 	
+	  @Operation(summary = "addProduct used to add a new product")
+	    @ApiResponses({
+	    	@ApiResponse(responseCode = "201", description = "Product Created"),
+	    	@ApiResponse(responseCode = "409", description = "Product Already Exist"),
+	    	@ApiResponse(responseCode = "400", description = "Bad request / Data Invalid ",
+            content = @Content)
+	    })
 	@PostMapping(GlobalHttpRequest_Product.ADD_PRODUCT)
 	public ResponseEntity<Boolean> addProduct(@Valid @RequestBody Product product) {
 		Boolean isAdded = service.addProduct(product);
@@ -43,6 +55,13 @@ public class ProductController {
 		}
 	}
 	
+	  @Operation(summary = "Get Product Details By Passing Product ID")
+	    @ApiResponses({
+	    	@ApiResponse(responseCode = "302", description = "Product Found"),
+	    	@ApiResponse(responseCode = "404", description = "Product Not Found"),
+	    	@ApiResponse(responseCode = "400", description = "Bad request / Data Invalid ",
+          content = @Content)
+	    })
 	@GetMapping(GlobalHttpRequest_Product.GET_PRODUCT_BY_ID)
 	public ResponseEntity<ProductModel> getProductById(@PathVariable Long productId) {
 		ProductModel productModel = service.getProductById(productId);
@@ -53,6 +72,13 @@ public class ProductController {
 		}
 	}
 	
+	  @Operation(summary = "Get All Product Details")
+	    @ApiResponses({
+	    	@ApiResponse(responseCode = "302", description = "Product Found"),
+	    	@ApiResponse(responseCode = "204", description = "No Data Available"),
+	    	@ApiResponse(responseCode = "400", description = "Bad request / Data Invalid ",
+        content = @Content)
+	    })
 	@GetMapping(GlobalHttpRequest_Product.GET_ALL_PRODUCTS)
 	public ResponseEntity<List<ProductModel>> getAllProduct() {
 		List<ProductModel> modelList = service.getAllProducts();

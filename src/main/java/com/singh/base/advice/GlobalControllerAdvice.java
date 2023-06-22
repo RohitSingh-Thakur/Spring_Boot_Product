@@ -1,7 +1,6 @@
 package com.singh.base.advice;
 
-import java.sql.SQLIntegrityConstraintViolationException;
-import java.util.HashMap; 
+import java.util.HashMap;
 import java.util.Map;
 
 import org.springframework.http.HttpStatus;
@@ -11,7 +10,6 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
-import com.singh.base.constants.Global_ExceptionConstants;
 import com.singh.base.exceptions.NoRecordFoundByIdException;
 import com.singh.base.exceptions.NoRecordFoundWithGivenName;
 import com.singh.base.exceptions.NoRecordsFound;
