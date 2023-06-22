@@ -19,6 +19,7 @@ import com.singh.base.constants.GlobalConstants_ValidateProduct;
 import com.singh.base.constants.Global_RegexConstants;
 
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -26,6 +27,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
+@Builder
 @Table(name = "Product_Table")
 public class Product{
 	

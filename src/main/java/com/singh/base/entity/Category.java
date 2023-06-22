@@ -18,6 +18,7 @@ import com.singh.base.constants.GlobalConstants_ValidateCategory;
 import com.singh.base.constants.Global_RegexConstants;
 
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -25,6 +26,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
+@Builder
 @Table(name = "Category_Table")
 public class Category {  // Validation Done
 	

@@ -45,7 +45,7 @@ public class ProductController {
 	    	@ApiResponse(responseCode = "400", description = "Bad request / Data Invalid ",
             content = @Content)
 	    })
-	@PostMapping(GlobalHttpRequest_Product.ADD_PRODUCT)
+	@PostMapping(path = GlobalHttpRequest_Product.ADD_PRODUCT, consumes = {"application/json"})
 	public ResponseEntity<Boolean> addProduct(@Valid @RequestBody Product product) {
 		Boolean isAdded = service.addProduct(product);
 		if (isAdded) {
