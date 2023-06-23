@@ -15,6 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.ReflectionUtils;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.mysql.cj.protocol.a.NativeConstants.IntegerDataType;
 import com.singh.base.dao.ProductDao;
 import com.singh.base.entity.Product;
 
@@ -76,17 +77,35 @@ public class ProductDaoImpl implements ProductDao {
 		return status;
 	}
 
+	@SuppressWarnings("unlikely-arg-type")
 	@Override
 	public Boolean updateProductByProductId(Long productId, Map<String, Object> productFields) { //productFields value is in Integer
 			
 		Boolean status = true;
 		try (Session session = factory.openSession()) {
 			Product product = session.get(Product.class, productId);
-			if (product != null) {
-				productFields.forEach((Key, Value) -> {
-					Field findField = ReflectionUtils.findField(Product.class, Key);// Not working for Long Fields //java.lang.IllegalArgumentException: Can not set java.lang.Long field com.singh.base.entity.Product.productQuantity to java.lang.Integer
+			if (product != null) 
+			{
+				productFields.forEach((Key, Value) ->
+				{
+					Field findField = ReflectionUtils.findField(Product.class, Key);
 					findField.setAccessible(true);
-					ReflectionUtils.setField(findField, product, Value);
+
+					// findField --> (Variable Name / Column Name)
+					
+					if(findField.getName().equalsIgnoreCase("productQuantity")) {
+						
+						Integer intValueOfProductQuantity = (Integer) productFields.get(findField.getName());
+						@SuppressWarnings("removal")
+						Long longValueOfProductQuantity = new Long(intValueOfProductQuantity);
+						
+						if(longValueOfProductQuantity instanceof Long) {
+							ReflectionUtils.setField(findField, product, longValueOfProductQuantity);
+						}
+						
+					}else {
+						ReflectionUtils.setField(findField, product, Value);
+					}
 				});
 				session.save(product);
 				session.beginTransaction().commit();

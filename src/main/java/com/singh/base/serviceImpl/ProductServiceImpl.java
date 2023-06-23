@@ -1,6 +1,7 @@
 package com.singh.base.serviceImpl;
 
-import java.util.List;  
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
@@ -8,12 +9,8 @@ import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.singh.base.constants.Global_ExceptionConstants;
 import com.singh.base.dao.ProductDao;
 import com.singh.base.entity.Product;
-import com.singh.base.exceptions.NoRecordFoundByIdException;
-import com.singh.base.exceptions.NoRecordsFound;
-import com.singh.base.exceptions.RecordAlreadyExistException;
 import com.singh.base.model.ProductModel;
 import com.singh.base.service.ProductService;
 
@@ -51,9 +48,7 @@ public class ProductServiceImpl implements ProductService {
 	public List<ProductModel> getAllProducts() {
 		List<Product> products = dao.getAllProducts();
 		if(!products.isEmpty()) {
-			 List<ProductModel> list = products.stream().map(e -> this.mapper.map(e, ProductModel.class)).toList();
-			 System.out.println("List : " + list.get(0).getClass().getName()); //Model Object
-			 return list;
+			 return products.stream().map(e -> this.mapper.map(e, ProductModel.class)).toList();
 		}else {
 			return null;
 		}
@@ -69,8 +64,10 @@ public class ProductServiceImpl implements ProductService {
 		}
 	}
 	
+	
 	@Override
 	public Boolean updateProductByProductId(Long  productId, Map<String, Object> productFields) {
+		
 		Boolean status = dao.updateProductByProductId(productId, productFields);
 		return status;
 	}
