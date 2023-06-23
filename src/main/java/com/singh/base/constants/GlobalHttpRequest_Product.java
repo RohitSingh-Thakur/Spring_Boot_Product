@@ -11,4 +11,5 @@ public class GlobalHttpRequest_Product {
 	public static final String GET_COUNT_SUMOF_PRODUCT_PRICE = "/count-sumof-product-price";
 	public static final String GET_TOTAL_PRODUCTS_COUNT = "/get-total-products-count";
 	public static final String GET_PRODUCT_BY_NAME = "/get-product-by-name";
+	public static final String UPLOAD_EXCELFILE = "/uploadExcellFile";
 }

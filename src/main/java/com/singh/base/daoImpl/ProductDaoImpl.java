@@ -221,5 +221,4 @@ public class ProductDaoImpl implements ProductDao {
 		}
 		return product;
 	}
-
 }

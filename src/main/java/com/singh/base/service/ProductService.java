@@ -3,6 +3,8 @@ package com.singh.base.service;
 import java.util.List;
 import java.util.Map;
 
+import org.springframework.web.multipart.MultipartFile;
+
 import com.singh.base.entity.Product;
 import com.singh.base.model.ProductModel;
 
@@ -21,5 +23,6 @@ public interface ProductService {
 	public List<ProductModel> getMaxPriceProducts();
 	public Double countSumOfProductPrice();
 	public Long getTotalCountOfProducts();
+	
 
 }
