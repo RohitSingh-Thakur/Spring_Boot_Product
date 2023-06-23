@@ -5,4 +5,4 @@ it is ok to print
 
 3> How To Print All Logs in File
 
-4> [PROBLEM STATEMENT] Patch Mapping update Supplier Id and Category Id by Product Id 
+4> [PROBLEM STATEMENT] Patch Mapping update Supplier Id and Category Id by Product Id nedd to done
