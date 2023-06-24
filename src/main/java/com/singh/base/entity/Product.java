@@ -37,7 +37,7 @@ public class Product{
 	
 	@NotBlank(message = GlobalConstants_ValidateProduct.productNameIsEmpty)
 	@Length(min = 2, max = 100, message = GlobalConstants_ValidateProduct.productNameLenght)
-	@Pattern(regexp = Global_RegexConstants.stringNotContainsDigit, message = GlobalConstants_ValidateProduct.productNameLenght)
+	//@Pattern(regexp = Global_RegexConstants.stringNotContainsDigit, message = GlobalConstants_ValidateProduct.productNameLenght)
 	@Column(nullable = false,unique = true)
 	private String productName;
 	

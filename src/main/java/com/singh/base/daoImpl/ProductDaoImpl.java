@@ -15,7 +15,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.ReflectionUtils;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.mysql.cj.protocol.a.NativeConstants.IntegerDataType;
 import com.singh.base.dao.ProductDao;
 import com.singh.base.entity.Product;
 
@@ -31,7 +30,11 @@ public class ProductDaoImpl implements ProductDao {
 		try (Session session = factory.openSession()) {
 			session.save(product);
 			session.beginTransaction().commit();
-		} catch (Exception e) { //java.sql.SQLIntegrityConstraintViolationException(product already exist)
+		} catch (Exception e) { 
+			e.printStackTrace();
+			//javax.persistence.RollbackException: Error while committing the transaction
+			//Caused by: javax.persistence.PersistenceException: org.hibernate.exception.ConstraintViolationException:
+			//Caused by: java.sql.SQLIntegrityConstraintViolationException: Duplicate entry
 			b = false;
 		}
 		return b;
@@ -220,5 +223,31 @@ public class ProductDaoImpl implements ProductDao {
 			product = null;
 		}
 		return product;
+	}
+
+	@Override
+	public String uploadFile(List<Product> list){
+		String message = null;
+		int productSaved = 0;
+		int totalExistRecordInDB = 0;
+		
+		
+		try(Session session = factory.openSession()) {
+			
+		for (Product product : list) {
+			Boolean isAdded = addProduct(product);
+			if(isAdded) {
+				productSaved += 1;
+			}else {
+				totalExistRecordInDB += 1;
+			}
+		}
+			message = "ProductAdded : " + productSaved + " & " + "Total Exist Record In DB: " + totalExistRecordInDB;
+			
+		} catch (Exception e) {
+			e.printStackTrace();
+			message = null;
+		}
+		return message;
 	}
 }

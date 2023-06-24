@@ -6,3 +6,5 @@ it is ok to print
 3> How To Print All Logs in File
 
 4> [PROBLEM STATEMENT] Patch Mapping update Supplier Id and Category Id by Product Id nedd to done
+
+5> Global Exception Handling When Duplicate entry found how to handle it.

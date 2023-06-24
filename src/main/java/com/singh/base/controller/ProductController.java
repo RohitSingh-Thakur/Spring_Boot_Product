@@ -186,5 +186,16 @@ public class ProductController {
 			throw new NoRecordFoundWithGivenName(Global_ExceptionConstants.NO_RECORD_FOUND_FOR_GIVEN_PRODUCT_NAME_EXCEPTION);
 		}
 	}
+	
+	@PostMapping(GlobalHttpRequest_Product.UPLOAD_EXCELFILE)
+	public ResponseEntity<String> uploadFile(@RequestParam("file") MultipartFile file)
+	{
+		String message = service.uploadFile(file);
+		if(message != null){
+				return new ResponseEntity<String>(message,HttpStatus.ACCEPTED);
+		}
+			return new ResponseEntity<String>("Products Not Saved...",HttpStatus.BAD_REQUEST);
+	}
 
 }
+

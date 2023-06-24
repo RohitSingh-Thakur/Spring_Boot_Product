@@ -3,6 +3,8 @@ package com.singh.base.dao;
 import java.util.List;
 import java.util.Map;
 
+import org.springframework.web.multipart.MultipartFile;
+
 import com.singh.base.entity.Product;
 
 public interface ProductDao {
@@ -16,4 +18,6 @@ public interface ProductDao {
 	public Double countSumOfProductPrice();
 	public Long getTotalCountOfProducts();
 	public Product getProductByName(String productName);
+	
+	public String uploadFile(List<Product> list);
 }
