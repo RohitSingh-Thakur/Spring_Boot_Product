@@ -229,8 +229,7 @@ public class ProductDaoImpl implements ProductDao {
 	public String uploadFile(List<Product> list){
 		String message = null;
 		int productSaved = 0;
-		int totalExistRecordInDB = 0;
-		
+		int productAlreadyExist = 0;
 		
 		try(Session session = factory.openSession()) {
 			
@@ -239,10 +238,10 @@ public class ProductDaoImpl implements ProductDao {
 			if(isAdded) {
 				productSaved += 1;
 			}else {
-				totalExistRecordInDB += 1;
+				productAlreadyExist += 1;
 			}
 		}
-			message = "ProductAdded : " + productSaved + " & " + "Total Exist Record In DB: " + totalExistRecordInDB;
+			message = "ProductAdded : " + productSaved + " & " + "Duplicate Entry : " + productAlreadyExist;
 			
 		} catch (Exception e) {
 			e.printStackTrace();
