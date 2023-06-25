@@ -1,9 +1,11 @@
 package com.singh.base.utility;
 
-import java.util.ArrayList;
+import java.util.ArrayList; 
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
+import org.apache.commons.collections4.map.HashedMap;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
@@ -14,10 +16,17 @@ import com.singh.base.entity.Category;
 import com.singh.base.entity.Product;
 import com.singh.base.entity.Supplier;
 
+import static com.singh.base.serviceImpl.ProductServiceImpl.completeFilePath;
+
 public class ProductUtility {
-	public static List<Product> readExcell(String filePath){
+	
+	public static Integer totalRecordInSheet = 0;
+		
+	public  List<Product> readExcell(String completeFilePath){
+		
 		List<Product> list = new ArrayList<>();
-		try(Workbook workbook = new XSSFWorkbook(filePath)) {
+		
+		try(Workbook workbook = new XSSFWorkbook(completeFilePath)) {
 			Sheet sheet = workbook.getSheet("products");
 			Iterator<Row> rowIterator = sheet.rowIterator();
 			while (rowIterator.hasNext()) {
@@ -29,7 +38,6 @@ public class ProductUtility {
 				Iterator<Cell> cellIterator = row.cellIterator();
 				while (cellIterator.hasNext()) {
 					Cell cell = (Cell) cellIterator.next();
-					
 					int columnIndex = cell.getColumnIndex();
 					switch (columnIndex) {
 					case 0:{
@@ -55,10 +63,56 @@ public class ProductUtility {
 				}	
 				}
 				list.add(product);
+				totalRecordInSheet += 1;
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 		return list;
+	}
+	
+	public  Map<Integer, List<Integer>> compareProducts(List<Product> allProducts)
+	{
+		List<Integer> rowIndex = new ArrayList<Integer>();
+		List<Integer> productNotInDB = new ArrayList<Integer>();
+		
+		try(Workbook workbook = new XSSFWorkbook(completeFilePath)) { 
+			Sheet sheet = workbook.getSheet("products"); 
+			Iterator<Row> rowIterator = sheet.rowIterator();
+			while (rowIterator.hasNext()) {
+				boolean found = false;
+				Row row = (Row) rowIterator.next();
+				if(row.getRowNum() == 0) {
+					continue; 
+				}
+				Iterator<Cell> cellIterator = row.cellIterator();
+				while (cellIterator.hasNext()) {
+					Cell cell = (Cell) cellIterator.next();
+					
+					for(int i=0; i<allProducts.size(); i++) {
+						if(cell.getRichStringCellValue().getString().equalsIgnoreCase(allProducts.get(i).getProductName())) {
+							found = true;
+							rowIndex.add(cell.getRowIndex()+1);
+							break; //--> end of while
+						}else {
+							continue;
+						}
+					}// end for loop
+					break;
+				}// end while
+				if(!found) {
+					productNotInDB.add(row.getRowNum()+1);
+				}else {
+				continue;
+				}
+			}// while end
+		}catch (Exception e) {
+			e.printStackTrace();
+		}		
+		Map<Integer, List<Integer>> result = new HashedMap<>();
+		result.put(1, rowIndex);
+		result.put(2, productNotInDB);
+		return result;
+
 	}
 }

@@ -1,6 +1,6 @@
 package com.singh.base.controller;
 
-import java.util.List;  
+import java.util.List; 
 import java.util.Map;
 
 import javax.validation.Valid;
@@ -28,7 +28,6 @@ import com.singh.base.exceptions.NoRecordsFound;
 import com.singh.base.exceptions.RecordAlreadyExistException;
 import com.singh.base.model.ProductModel;
 import com.singh.base.service.ProductService;
-import com.singh.base.serviceImpl.ProductServiceImpl;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -194,7 +193,7 @@ public class ProductController {
 		if(message != null){
 				return new ResponseEntity<String>(message,HttpStatus.ACCEPTED);
 		}
-			return new ResponseEntity<String>("Products Not Saved...",HttpStatus.BAD_REQUEST);
+			return new ResponseEntity<String>(message,HttpStatus.BAD_REQUEST);
 	}
 
 }

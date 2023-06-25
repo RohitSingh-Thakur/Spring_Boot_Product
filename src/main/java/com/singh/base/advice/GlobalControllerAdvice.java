@@ -10,14 +10,13 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
-import com.singh.base.constants.Global_ExceptionConstants;
 import com.singh.base.exceptions.NoRecordFoundByIdException;
 import com.singh.base.exceptions.NoRecordFoundWithGivenName;
 import com.singh.base.exceptions.NoRecordsFound;
 import com.singh.base.exceptions.RecordAlreadyExistException;
 
 @RestControllerAdvice
-public class GlobalControllerAdvice {
+public class GlobalControllerAdvice{
 	
 	@ExceptionHandler(MethodArgumentNotValidException.class)
 	public ResponseEntity<Map<String,String>> handlemethodArgumentNotValidException(MethodArgumentNotValidException methodArgumentNotValidException) {
@@ -59,4 +58,5 @@ public class GlobalControllerAdvice {
 	public ResponseEntity<String> handleNullPointerException(NullPointerException obj){
 		return new ResponseEntity<String>(obj.getMessage(),HttpStatus.BAD_REQUEST);
 	}
+	
 }

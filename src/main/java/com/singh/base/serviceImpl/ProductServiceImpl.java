@@ -2,27 +2,17 @@ package com.singh.base.serviceImpl;
 
 import java.io.File;
 import java.io.FileOutputStream;
-import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
-import org.apache.poi.ss.usermodel.Cell;
-import org.apache.poi.ss.usermodel.CellType;
-import org.apache.poi.ss.usermodel.Row;
-import org.apache.poi.ss.usermodel.Sheet;
-import org.apache.poi.ss.usermodel.Workbook;
-import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.singh.base.dao.ProductDao;
-import com.singh.base.entity.Category;
 import com.singh.base.entity.Product;
-import com.singh.base.entity.Supplier;
 import com.singh.base.model.ProductModel;
 import com.singh.base.service.ProductService;
 import com.singh.base.utility.ProductUtility;
@@ -37,6 +27,8 @@ public class ProductServiceImpl implements ProductService {
 	private ModelMapper mapper;
 	
 	private static final Logger log = Logger.getLogger(ProductServiceImpl.class);
+	
+	public static String completeFilePath;
 
 	@Override
 	public Boolean addProduct(Product product) {
@@ -135,16 +127,15 @@ public class ProductServiceImpl implements ProductService {
 		String message = null;
 		String path = "src/main/resources";
 		String filename = file.getOriginalFilename();
-		try(FileOutputStream fos = new FileOutputStream(path+File.separator+filename)) {
+		completeFilePath = path+File.separator+filename;
+		try(FileOutputStream fos = new FileOutputStream(completeFilePath)) {
 			byte[] data = file.getBytes();
 			fos.write(data);
-			List<Product> list = ProductUtility.readExcell(path+File.separator+filename);
-			message = dao.uploadFile(list);	
+			List<Product> fileProductList = new ProductUtility().readExcell(completeFilePath);
+			message = dao.uploadFile(fileProductList);	
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 		return message;
-	}
-
-	
+	}	
 }
