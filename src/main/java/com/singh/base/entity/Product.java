@@ -11,23 +11,26 @@ import javax.persistence.Table;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Pattern;
 
 import org.hibernate.validator.constraints.Length;
 
 import com.singh.base.constants.GlobalConstants_ValidateProduct;
-import com.singh.base.constants.Global_RegexConstants;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.RequiredArgsConstructor;
+import lombok.Setter;
 
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
 @Builder
+@Setter
+@Getter
 @Table(name = "Product_Table")
 public class Product{
 	
