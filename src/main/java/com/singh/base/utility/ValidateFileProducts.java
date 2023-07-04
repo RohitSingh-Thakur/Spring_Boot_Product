@@ -21,16 +21,16 @@ import com.singh.base.service.SupplierService;
 public class ValidateFileProducts {
 	
 	@Autowired
-	private SupplierService supplierServiceValidate;
+	private SupplierService supplierService;
 	
 	@Autowired
-	private CategoryService categoryServiceValidate;
+	private CategoryService categoryService;
 	
 	@Autowired
 	private ModelMapper mapper;
 	
-	Supplier supplier;
-	Category category;
+	Supplier supplier = null;
+	Category category = null;
 	
 	public Map<String, String> validateFileProducts(Product product){
 		
@@ -39,13 +39,15 @@ public class ValidateFileProducts {
 		if(product.getProductName() == null) {
 			validProduct.put("Product Name : ", GlobalConstants_ValidateProduct.productNameIsEmpty+GlobalConstants_ValidateProduct.productNameLenght);
 		}
-		SupplierModel supplierModel = supplierServiceValidate.getSupplierById(product.getSupplierId().getSupplierId());
+		
+		SupplierModel supplierModel = supplierService.getSupplierById(product.getSupplierId().getSupplierId());
 		supplier = this.mapper.map(supplierModel, Supplier.class);
 		if(supplier == null) {
 			validProduct.put("Supplier ID : ", "No Supplier ID Found");
 		}
 		
-		CategoryModel categoryModel = categoryServiceValidate.getCategoryById(product.getCategoryId().getCategoryId());
+		
+		CategoryModel categoryModel = categoryService.getCategoryById(product.getCategoryId().getCategoryId());
 		category = this.mapper.map(categoryModel, Category.class);
 		if(category == null) {
 			validProduct.put("Category ID : ", "No Category ID Found");

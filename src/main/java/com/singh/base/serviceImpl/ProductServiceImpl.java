@@ -8,6 +8,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.collections4.map.HashedMap;
 import org.apache.log4j.Logger;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
@@ -36,16 +37,18 @@ public class ProductServiceImpl implements ProductService {
 	@Autowired
 	private ModelMapper mapper;
 	
+	@Autowired
+	private ValidateFileProducts validateFileProducts;
+	
 	private static final Logger log = Logger.getLogger(ProductServiceImpl.class);
 	
 	private String completeFileName;
 	
-	private int alreadyExistRowCount = 0;
+	private int alreadyExist = 0;
 	
 	private List<Integer> alreadyExistProductsRowNumbers = new ArrayList<Integer>();
 	
-	private Map<Integer, Map<String, String>> notValidProduct;
-	
+	private Map<Integer, Map<String, String>> notValidProduct = new LinkedHashMap<>();	
 	private Map<String, Object> responseMap = new LinkedHashMap<>();
 
 	@Override
@@ -148,15 +151,11 @@ public class ProductServiceImpl implements ProductService {
 		completeFileName = path+File.separator+filename;
 		
 		Integer addedCount = null;
-		Map<String, String> validatedFileProducts = null;
+		
+		Map<String, String> errorMap = new HashedMap<String, String>();
 		List<Product> list = new ArrayList<Product>();
 		Integer totalRowsInExcelFile = 0;		
 		
-		
-		
-		
-		
-
 		try(FileOutputStream fos = new FileOutputStream(completeFileName)) {
 			byte[] data = file.getBytes();
 			fos.write(data);
@@ -165,16 +164,22 @@ public class ProductServiceImpl implements ProductService {
 				
 				Sheet sheet = workbook.getSheet("products");
 				Iterator<Row> rowIterator = sheet.rowIterator();
+				
 				while (rowIterator.hasNext()) {
 					Row row = (Row) rowIterator.next();
+					
 					if(row.getRowNum() == 0) {
 						continue; // if condition matched then continue will stop the condition and pointer will go to while loop again
 					}
+					
 					Product product = new Product(); // creating project below if because if condition is excluding header and if object created above if then for 0th index which is header row one student object will be created.
+					
 					Iterator<Cell> cellIterator = row.cellIterator();
+					
 					while (cellIterator.hasNext()) {
 						Cell cell = (Cell) cellIterator.next();
 						int columnIndex = cell.getColumnIndex();
+						
 						switch (columnIndex) {
 						case 0:{
 							product.setProductName(cell.getStringCellValue());
@@ -199,25 +204,25 @@ public class ProductServiceImpl implements ProductService {
 					}//end switch
 				}//end while
 					
-					validatedFileProducts = new ValidateFileProducts().validateFileProducts(product);
+					errorMap = validateFileProducts.validateFileProducts(product);
 					
-					if(validatedFileProducts.isEmpty()) {
+					if(errorMap.isEmpty()) {
 						Product dBProduct = dao.getProductByName(product.getProductName());
 						if(dBProduct == null) {
-							list.add(dBProduct);
+							list.add(product);
 						}else {
-							alreadyExistRowCount += 1;
-							alreadyExistProductsRowNumbers.add(row.getRowNum());
+							alreadyExist += 1;
+							alreadyExistProductsRowNumbers.add(row.getRowNum()+1);
 						}
 					}else {
-						notValidProduct.put(row.getRowNum()+1,validatedFileProducts );
+						notValidProduct.put(row.getRowNum()+1,errorMap );
 					}
 					
 					totalRowsInExcelFile += 1;
 					
 				}
 				
-				////////////////////////////////////////////////
+				//////////////////////////////////////////////// Changes Done With File Upload
 				
 			} catch (Exception e) {
 				e.printStackTrace();
@@ -229,9 +234,9 @@ public class ProductServiceImpl implements ProductService {
 		
 		responseMap.put("Total Record In Sheet : ", totalRowsInExcelFile);
 		responseMap.put("Uploaded Record In Db", addedCount);
-		responseMap.put("Total Exists Records In DB", alreadyExistRowCount);
+		responseMap.put("Total Exists Records In DB", alreadyExist);
 		responseMap.put("Row Num, Exists Record In DB", alreadyExistProductsRowNumbers);
-		responseMap.put("Excluded Record Count", validatedFileProducts.size());
+		responseMap.put("Excluded Record Count", notValidProduct.size());
 		responseMap.put("Bad Records Row Num", notValidProduct);
 		
 		return responseMap;
