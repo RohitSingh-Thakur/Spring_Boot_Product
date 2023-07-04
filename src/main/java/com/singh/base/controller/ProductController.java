@@ -156,7 +156,7 @@ public class ProductController {
 		if(sumOfProductPrice>0) {
 			return new ResponseEntity<>(sumOfProductPrice, HttpStatus.OK);
 		}else {
-			throw new NoRecordsFound();  
+			throw new NoRecordsFound(Global_ExceptionConstants.RECORD_ALREADY_FOUND_OF_PRODUCT_EXCEPTION);  
 		}
 	}
 	
@@ -169,7 +169,7 @@ public class ProductController {
 		if(productCount>0) {
 			return new ResponseEntity<>(productCount, HttpStatus.OK);
 		}else {
-			throw new NoRecordsFound();  
+			throw new NoRecordsFound(Global_ExceptionConstants.RECORD_ALREADY_FOUND_OF_PRODUCT_EXCEPTION);  
 		}
 	}
 	
@@ -187,13 +187,13 @@ public class ProductController {
 	}
 	
 	@PostMapping(GlobalHttpRequest_Product.UPLOAD_EXCELFILE)
-	public ResponseEntity<String> uploadFile(@RequestParam("file") MultipartFile file)
+	public ResponseEntity<Map<String, Object>> uploadFile(@RequestParam("file") MultipartFile file)
 	{
-		String message = service.uploadFile(file);
-		if(message != null){
-				return new ResponseEntity<String>(message,HttpStatus.ACCEPTED);
+		 Map<String, Object> uploadFile = service.uploadFile(file);
+		if(uploadFile != null){
+				return new ResponseEntity<Map<String, Object>>(uploadFile,HttpStatus.ACCEPTED);
 		}
-			return new ResponseEntity<String>(message,HttpStatus.BAD_REQUEST);
+			return new ResponseEntity<Map<String, Object>>(uploadFile,HttpStatus.BAD_REQUEST);
 	}
 
 }

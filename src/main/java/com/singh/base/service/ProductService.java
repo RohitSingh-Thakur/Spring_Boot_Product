@@ -24,7 +24,7 @@ public interface ProductService {
 	public Double countSumOfProductPrice();
 	public Long getTotalCountOfProducts();
 	
-	public String uploadFile(MultipartFile file);
+	public Map<String, Object> uploadFile(MultipartFile file);
 	
 
 }

@@ -19,5 +19,5 @@ public interface ProductDao {
 	public Long getTotalCountOfProducts();
 	public Product getProductByName(String productName);
 	
-	public String uploadFile(List<Product> list);
+	public Integer uploadFile(List<Product> productsListFromFile);
 }

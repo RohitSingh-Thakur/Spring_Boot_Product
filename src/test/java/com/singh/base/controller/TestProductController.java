@@ -47,7 +47,7 @@ public class TestProductController {
 	
 	@Test
 	@Disabled
-	public void testAddProduct() throws Exception {
+	/*public void testAddProduct() throws Exception {
 		
 		when(service.addProduct(ArgumentMatchers.any())).thenReturn(true);
 		
@@ -72,7 +72,7 @@ public class TestProductController {
 		
 	}
 	
-	@Test
+	@Test*/
 	public void getProductById() throws Exception {
 		
 		/* Long productId = 155L;

@@ -1,7 +1,6 @@
 package com.singh.base.daoImpl;
 
 import java.lang.reflect.Field;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -18,7 +17,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.singh.base.dao.ProductDao;
 import com.singh.base.entity.Product;
-import com.singh.base.utility.ProductUtility;
 
 @RestController
 public class ProductDaoImpl implements ProductDao {
@@ -32,14 +30,12 @@ public class ProductDaoImpl implements ProductDao {
 		try (Session session = factory.openSession()) {
 			session.save(product);
 			session.beginTransaction().commit();
-		} catch (Exception e) {
+		} catch (Exception e) { 
 			e.printStackTrace();
+			//javax.persistence.RollbackException: Error while committing the transaction
+			//Caused by: javax.persistence.PersistenceException: org.hibernate.exception.ConstraintViolationException:
+			//Caused by: java.sql.SQLIntegrityConstraintViolationException: Duplicate entry
 			b = false;
-			// javax.persistence.RollbackException: Error while committing the transaction
-			// Caused by: javax.persistence.PersistenceException:
-			// org.hibernate.exception.ConstraintViolationException:
-			// Caused by: java.sql.SQLIntegrityConstraintViolationException: Duplicate entry
-		
 		}
 		return b;
 	}
@@ -86,30 +82,31 @@ public class ProductDaoImpl implements ProductDao {
 
 	@SuppressWarnings("unlikely-arg-type")
 	@Override
-	public Boolean updateProductByProductId(Long productId, Map<String, Object> productFields) { // productFields value
-																									// is in Integer
-
+	public Boolean updateProductByProductId(Long productId, Map<String, Object> productFields) { //productFields value is in Integer
+			
 		Boolean status = true;
 		try (Session session = factory.openSession()) {
 			Product product = session.get(Product.class, productId);
-			if (product != null) {
-				productFields.forEach((Key, Value) -> {
+			if (product != null) 
+			{
+				productFields.forEach((Key, Value) ->
+				{
 					Field findField = ReflectionUtils.findField(Product.class, Key);
 					findField.setAccessible(true);
 
 					// findField --> (Variable Name / Column Name)
-
-					if (findField.getName().equalsIgnoreCase("productQuantity")) {
-
+					
+					if(findField.getName().equalsIgnoreCase("productQuantity")) {
+						
 						Integer intValueOfProductQuantity = (Integer) productFields.get(findField.getName());
 						@SuppressWarnings("removal")
 						Long longValueOfProductQuantity = new Long(intValueOfProductQuantity);
-
-						if (longValueOfProductQuantity instanceof Long) {
+						
+						if(longValueOfProductQuantity instanceof Long) {
 							ReflectionUtils.setField(findField, product, longValueOfProductQuantity);
 						}
-
-					} else {
+						
+					}else {
 						ReflectionUtils.setField(findField, product, Value);
 					}
 				});
@@ -143,10 +140,10 @@ public class ProductDaoImpl implements ProductDao {
 		}
 		return list;
 	}
-
+	
 	public Double getMaxPrice() {
 		Double maxPrice = 0d;
-		try (Session session = factory.openSession()) {
+		try(Session session = factory.openSession()) {
 			@SuppressWarnings("deprecation")
 			Criteria criteria = session.createCriteria(Product.class);
 			criteria.setProjection(Projections.max("productPrice"));
@@ -157,13 +154,13 @@ public class ProductDaoImpl implements ProductDao {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		return maxPrice;
+			return maxPrice;
 	}
 
 	@Override
 	public List<Product> getMaxPriceProducts() {
 		List<Product> products = null;
-		try (Session session = factory.openSession()) {
+		try(Session session = factory.openSession()) {
 			Double maxPrice = getMaxPrice();
 			if (maxPrice > 0) {
 				Criteria criteria = session.createCriteria(Product.class);
@@ -172,14 +169,14 @@ public class ProductDaoImpl implements ProductDao {
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
-		}
+		} 
 		return products;
 	}
 
 	@Override
 	public Double countSumOfProductPrice() {
 		Double sumOfProductPrice = 0d;
-		try (Session session = factory.openSession()) {
+		try(Session session = factory.openSession()) {
 			Criteria criteria = session.createCriteria(Product.class);
 			criteria.setProjection(Projections.sum("productPrice"));
 			List list = criteria.list();
@@ -195,7 +192,7 @@ public class ProductDaoImpl implements ProductDao {
 	@Override
 	public Long getTotalCountOfProducts() {
 		long productCount = 0;
-		try (Session session = factory.openSession()) {
+		try(Session session = factory.openSession()) {
 			@SuppressWarnings("deprecation")
 			Criteria criteria = session.createCriteria(Product.class);
 			criteria.setProjection(Projections.rowCount());
@@ -203,7 +200,7 @@ public class ProductDaoImpl implements ProductDao {
 			if (!list.isEmpty()) {
 				productCount = (Long) list.get(0);
 			}
-		} catch (Exception e) {
+		}catch (Exception e) {
 			e.printStackTrace();
 		}
 		return productCount;
@@ -213,15 +210,15 @@ public class ProductDaoImpl implements ProductDao {
 	@Override
 	public Product getProductByName(String productName) {
 		Product product = null;
-		try (Session session = factory.openSession()) {
+		try(Session session = factory.openSession()) {
 			Criteria criteria = session.createCriteria(Product.class);
 			List list = criteria.add(Restrictions.ilike("productName", productName, MatchMode.ANYWHERE)).list();
-			if (!list.isEmpty()) {
+			if(!list.isEmpty()) {
 				product = (Product) list.get(0);
-			} else {
+			}else {
 				return product;
 			}
-		} catch (Exception e) {
+		}catch (Exception e) {
 			e.printStackTrace();
 			product = null;
 		}
@@ -229,42 +226,17 @@ public class ProductDaoImpl implements ProductDao {
 	}
 
 	@Override
-	public String uploadFile(List<Product> fileProductList) {
-		String message = null;
+	public Integer uploadFile(List<Product> list){
+
 		int productSaved = 0;
-		
-		Map<Integer, List<Integer>> mapValue;
-		List<Product> allProducts = getAllProducts();
-		
-		List<Integer> alreadyExist = null;
-		int alreayExistCount = 0;
-		
-		try (Session session = factory.openSession()) {
 
-			mapValue = new ProductUtility().compareProducts(allProducts); // Already Exist Product Row Number List
-			 alreadyExist = mapValue.get(1);
-			 
-			 List<Integer> NotInDBRouCount = mapValue.get(2);
-			 int NotInDBCount = NotInDBRouCount.size();
-			 
-			for (Product product : fileProductList) {
-				Boolean isAdded = addProduct(product);//
-				if (isAdded) {
-					productSaved += 1;
-				} else {
-					alreayExistCount= alreadyExist.size();
-				}
+		for (Product product : list) {
+			Boolean isAdded = addProduct(product);
+			if(isAdded) {
+				productSaved += 1;
 			}
-			message = "Uploaded Records In DB : " + productSaved + "\n" + "Total Existing Record In DB : "
-					+ alreayExistCount+ "\n" + "Already Exist In DB :" + alreadyExist + "\n"
-					+ " Total Records In Sheet : "+ProductUtility.totalRecordInSheet + "\n"
-					+ " Products Not Added In DB Count : " + NotInDBCount + "\n"
-					+ "Indexes Of Products " + NotInDBRouCount;
-		} catch (Exception e) {
-			e.printStackTrace();
-			message = null;
 		}
-		return message;
-	}
+		return productSaved;
 
+	}
 }

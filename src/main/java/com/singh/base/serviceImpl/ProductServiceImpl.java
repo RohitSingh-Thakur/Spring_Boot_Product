@@ -2,20 +2,30 @@ package com.singh.base.serviceImpl;
 
 import java.io.File;
 import java.io.FileOutputStream;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
+import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.singh.base.dao.ProductDao;
+import com.singh.base.entity.Category;
 import com.singh.base.entity.Product;
+import com.singh.base.entity.Supplier;
 import com.singh.base.model.ProductModel;
 import com.singh.base.service.ProductService;
-import com.singh.base.utility.ProductUtility;
+import com.singh.base.utility.ValidateFileProducts;
 
 @Service
 public class ProductServiceImpl implements ProductService {
@@ -28,7 +38,15 @@ public class ProductServiceImpl implements ProductService {
 	
 	private static final Logger log = Logger.getLogger(ProductServiceImpl.class);
 	
-	public static String completeFilePath;
+	private String completeFileName;
+	
+	private int alreadyExistRowCount = 0;
+	
+	private List<Integer> alreadyExistProductsRowNumbers = new ArrayList<Integer>();
+	
+	private Map<Integer, Map<String, String>> notValidProduct;
+	
+	private Map<String, Object> responseMap = new LinkedHashMap<>();
 
 	@Override
 	public Boolean addProduct(Product product) {
@@ -123,19 +141,101 @@ public class ProductServiceImpl implements ProductService {
 	}
 
 	@Override
-	public String uploadFile(MultipartFile file) {
-		String message = null;
+	public Map<String, Object> uploadFile(MultipartFile file) {
+		
 		String path = "src/main/resources";
 		String filename = file.getOriginalFilename();
-		completeFilePath = path+File.separator+filename;
-		try(FileOutputStream fos = new FileOutputStream(completeFilePath)) {
+		completeFileName = path+File.separator+filename;
+		
+		Integer addedCount = null;
+		Map<String, String> validatedFileProducts = null;
+		List<Product> list = new ArrayList<Product>();
+		Integer totalRowsInExcelFile = 0;		
+		
+		
+		
+		
+		
+
+		try(FileOutputStream fos = new FileOutputStream(completeFileName)) {
 			byte[] data = file.getBytes();
 			fos.write(data);
-			List<Product> fileProductList = new ProductUtility().readExcell(completeFilePath);
-			message = dao.uploadFile(fileProductList);	
+			
+			try(Workbook workbook = new XSSFWorkbook(completeFileName)) {
+				
+				Sheet sheet = workbook.getSheet("products");
+				Iterator<Row> rowIterator = sheet.rowIterator();
+				while (rowIterator.hasNext()) {
+					Row row = (Row) rowIterator.next();
+					if(row.getRowNum() == 0) {
+						continue; // if condition matched then continue will stop the condition and pointer will go to while loop again
+					}
+					Product product = new Product(); // creating project below if because if condition is excluding header and if object created above if then for 0th index which is header row one student object will be created.
+					Iterator<Cell> cellIterator = row.cellIterator();
+					while (cellIterator.hasNext()) {
+						Cell cell = (Cell) cellIterator.next();
+						int columnIndex = cell.getColumnIndex();
+						switch (columnIndex) {
+						case 0:{
+							product.setProductName(cell.getStringCellValue());
+							break;
+						}case 1:{
+							Supplier supplier = new Supplier();
+							supplier.setSupplierId((long)cell.getNumericCellValue());	
+							product.setSupplierId(supplier);
+							break;
+						}case 2:{
+							Category category = new Category();
+							category.setCategoryId((long)cell.getNumericCellValue());
+							product.setCategoryId(category);
+							break;
+						}case 3:{
+							product.setProductQuantity((long)cell.getNumericCellValue());
+							break;
+						}case 4:{
+							product.setProductPrice(cell.getNumericCellValue());
+							break;
+						}
+					}//end switch
+				}//end while
+					
+					validatedFileProducts = new ValidateFileProducts().validateFileProducts(product);
+					
+					if(validatedFileProducts.isEmpty()) {
+						Product dBProduct = dao.getProductByName(product.getProductName());
+						if(dBProduct == null) {
+							list.add(dBProduct);
+						}else {
+							alreadyExistRowCount += 1;
+							alreadyExistProductsRowNumbers.add(row.getRowNum());
+						}
+					}else {
+						notValidProduct.put(row.getRowNum()+1,validatedFileProducts );
+					}
+					
+					totalRowsInExcelFile += 1;
+					
+				}
+				
+				////////////////////////////////////////////////
+				
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+			addedCount = dao.uploadFile(list);	
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		return message;
-	}	
+		
+		responseMap.put("Total Record In Sheet : ", totalRowsInExcelFile);
+		responseMap.put("Uploaded Record In Db", addedCount);
+		responseMap.put("Total Exists Records In DB", alreadyExistRowCount);
+		responseMap.put("Row Num, Exists Record In DB", alreadyExistProductsRowNumbers);
+		responseMap.put("Excluded Record Count", validatedFileProducts.size());
+		responseMap.put("Bad Records Row Num", notValidProduct);
+		
+		return responseMap;
+	}
+
+	
 }
