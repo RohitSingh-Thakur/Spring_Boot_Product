@@ -226,27 +226,17 @@ public class ProductDaoImpl implements ProductDao {
 	}
 
 	@Override
-	public String uploadFile(List<Product> list){
-		String message = null;
+	public Integer uploadFile(List<Product> list){
+
 		int productSaved = 0;
-		int productAlreadyExist = 0;
-		
-		try(Session session = factory.openSession()) {
-			
+
 		for (Product product : list) {
 			Boolean isAdded = addProduct(product);
 			if(isAdded) {
 				productSaved += 1;
-			}else {
-				productAlreadyExist += 1;
 			}
 		}
-			message = "ProductAdded : " + productSaved + " & " + "Duplicate Entry : " + productAlreadyExist;
-			
-		} catch (Exception e) {
-			e.printStackTrace();
-			message = null;
-		}
-		return message;
+		return productSaved;
+
 	}
 }
