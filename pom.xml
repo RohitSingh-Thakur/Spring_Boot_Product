@@ -23,6 +23,12 @@
 	
 	<dependencies>
 	
+	<dependency>
+		<groupId>org.sonarsource.scanner.maven</groupId>
+		<artifactId>sonar-maven-plugin</artifactId>
+		<version>3.2</version>
+	</dependency>
+	
 	<!-- https://mvnrepository.com/artifact/org.apache.poi/poi -->
 		<dependency>
 			<groupId>org.apache.poi</groupId>
@@ -111,6 +117,23 @@
 		</dependency>
 
 	</dependencies>
+	
+	<!-- Profile Added For Sonar -->
+	
+	<profiles>
+		<profile>
+			<id>sonar</id>
+			<activation>
+				<activeByDefault>true</activeByDefault>
+			</activation>
+			<properties>
+				<!-- Optional URL to Server. Default value is http://localhost:9000 -->
+				<sonar.host.url>
+					http://localhost:9000
+				</sonar.host.url>
+			</properties>
+		</profile>
+	</profiles>
 
 	<build>
 		<plugins>

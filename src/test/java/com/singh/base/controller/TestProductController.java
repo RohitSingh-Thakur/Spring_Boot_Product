@@ -46,15 +46,14 @@ public class TestProductController {
 	private MockMvc mockMvc; // used to send request to Rest API  
 	
 	@Test
-	@Disabled
-	/*public void testAddProduct() throws Exception {
+	public void testAddProduct() throws Exception {
 		
 		when(service.addProduct(ArgumentMatchers.any())).thenReturn(true);
 		
 		Category category = new Category(12L, "Hardware", "All Hardware Products Are Available Here", 50, 12, 200);
 		Supplier supplier = new Supplier(45L, "Baba Suppliers", "Mumbai", "404454", "India", "4545454545");
 		
-		Product product = new Product(45L, "MotherBourd", supplier, category, 0L, 1500d);
+		Product product = new Product(45L, "MotherBourd", supplier, category, 10L, 1500d);
 		
 		ObjectMapper mapper = new ObjectMapper();
 		String productJson = mapper.writeValueAsString(product); //write() to convert Object into JSon format
@@ -72,10 +71,10 @@ public class TestProductController {
 		
 	}
 	
-	@Test*/
+	@Test
 	public void getProductById() throws Exception {
 		
-		/* Long productId = 155L;
+		 Long productId = 155L;
 		
 		CategoryModel category = CategoryModel.builder()
 				.categoryId(30L).categoryName("Stationary")
@@ -95,7 +94,8 @@ public class TestProductController {
 		 
 		 ResultActions response = mockMvc.perform(get("/getProductById/{productId}", productId));
 		 response.andExpect(status().isFound())
-         .andDo(print()); <<<<<<<<<<<<<<<<<<FIRST WAY TO TEST API FOR GET>>>>>>>>>>>>>>>>>>>*/ 
+         .andDo(print()); 
+		 //<<<<<<<<<<<<<<<<<<FIRST WAY TO TEST API FOR GET>>>>>>>>>>>>>>>>>>>*/ 
          
 	}
 
